@@ -1,0 +1,97 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+services:
+  web:
+    image: coordees/backend:latest
+    ports:
+      - "80:80"
+      - "4000:4000"
+  # traefik:
+  #   image: traefik:v2.11
+  #   command:
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #   ports:
+  #     - "4002:4002"
+  #     - "443:443"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - traefik-net
+  server:
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+      MYSQL_DATABASE: coordeesdc
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: Password
+    command: [ "npx", "nodemon", "server.js" ]
+    ports:
+      - 4001:4001
+    depends_on:
+      - localhost
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p",
+          "Password"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.server.rule=Host(`coordees.com`)"
+    #   - "traefik.http.routers.server.entrypoints=http"
+    #   - "traefik.http.services.server.loadbalancer.server.port=4001"
+  localhost:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: coordeesdc
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: Password
+    expose:
+      - 3306
+    #     networks:
+    #       - traefik-net
+
+    # networks:
+    #   traefik-net:
+    #     external: true
+    #   backend_default:
+    #     external: true
+    # The commented out section below is an example of how to define a PostgreSQL
+    # database that your application can use. `depends_on` tells Docker Compose to
+    # start the database before your application. The `db-data` volume persists the
+    # database data between container restarts. The `db-password` secret is used
+    # to set the database password. You must create `db/password.txt` and add
+    # a password of your choosing to it before running `docker-compose up`.
+    #     depends_on:
+    #       db:
+    #         condition: service_healthy
+    #     user: postgres
+    #     secrets:
+    #       - db-password
+    #     volumes:
+    #       - db-data:/var/lib/postgresql/data
+    # volumes:
+    # db-data:
+    # secrets:
+    #   db-password:
+    #     file: db/password.txt
