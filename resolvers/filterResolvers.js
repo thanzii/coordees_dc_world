@@ -1,5 +1,4 @@
 import { Technician } from "../db/models/technicianModel.js";
-import { Op } from "sequelize";
 
 // Helper function to calculate Haversine distance
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -56,21 +55,21 @@ export const filterResolvers = {
 
       try {
         const technicians = await Technician.findAll();
+
         const filteredTechnicians = technicians.filter((technician) => {
-          const technicianLat = technician.location[0].lat;
-          const technicianLon = technician.location[0].lon;
-          return selectedLocations.some((location) => {
-            const locationLat = location.lat;
-            const locationLon = location.lon;
-            const distance = calculateDistance(
-              technicianLat,
-              technicianLon,
-              locationLat,
-              locationLon
-            );
-            return distance <= 5;
+          return technician.location.some((technicianLocation) => {
+            return selectedLocations.some((selectedLocation) => {
+              const distance = calculateDistance(
+                technicianLocation.lat,
+                technicianLocation.lon,
+                selectedLocation.lat,
+                selectedLocation.lon
+              );
+              return distance <= 5; // Adjust the radius as needed
+            });
           });
         });
+
         return filteredTechnicians;
       } catch (error) {
         console.error("Error filtering technicians by location:", error);
@@ -80,36 +79,56 @@ export const filterResolvers = {
 
     getFilteredTechnicians: async (
       _,
-      { page = 1, pageSize = 7, locations }
+      { page = 1, pageSize = 7, locations, profession, companyName }
     ) => {
       const offset = (page - 1) * pageSize;
-      const selectedLocations = Array.isArray(locations)
-        ? locations
-        : [locations];
+      const selectedLocations = locations
+        ? Array.isArray(locations)
+          ? locations
+          : [locations]
+        : null;
+      let matchesLocation = true;
+      let matchesProfession = true;
+      let matchesCompany = true;
       try {
         const technicians = await Technician.findAll();
+
         const filteredTechnicians = technicians.filter((technician) => {
-          const technicianLat = technician.location[0].lat;
-          const technicianLon = technician.location[0].lon;
-          return selectedLocations.some((location) => {
-            const locationLat = location.lat;
-            const locationLon = location.lon;
-            const distance = calculateDistance(
-              technicianLat,
-              technicianLon,
-              locationLat,
-              locationLon
-            );
-            return distance <= 5;
-          });
+          if (selectedLocations && selectedLocations.length > 0) {
+            matchesLocation = technician.location.some((technicianLocation) => {
+              return selectedLocations.some((selectedLocation) => {
+                const distance = calculateDistance(
+                  technicianLocation.lat,
+                  technicianLocation.lon,
+                  selectedLocation?.lat,
+                  selectedLocation?.lon
+                );
+                return distance <= 5; // Adjust the radius as needed
+              });
+            });
+          }
+
+          if (profession) {
+            matchesProfession =
+              technician.profession &&
+              technician.profession.toLowerCase() === profession.toLowerCase();
+          }
+
+          if (companyName) {
+            matchesCompany =
+              technician.company &&
+              technician.company.toLowerCase() === companyName.toLowerCase();
+          }
+
+          return matchesLocation && matchesProfession && matchesCompany;
         });
 
         const totalFilteredTechnicians = filteredTechnicians.length;
-
+        console.log("fttt>>", filteredTechnicians);
         return {
           success: true,
           message: "Filtered technicians retrieved successfully",
-          technicians: filteredTechnicians,
+          technicians: filteredTechnicians.slice(offset, offset + pageSize),
           pageInfo: {
             page,
             pageSize,
@@ -127,6 +146,57 @@ export const filterResolvers = {
             pageSize: 7,
             total: 0,
           },
+        };
+      }
+    },
+
+    filterTechniciansByCompany: async (_, { companyName }) => {
+      try {
+        const technicians = await Technician.findAll();
+        const filteredTechnicians = technicians.filter((technician) => {
+          return companyName
+            ? technician.company &&
+                technician.company.name.toLowerCase() ===
+                  companyName.toLowerCase()
+            : true;
+        });
+
+        return {
+          success: true,
+          message: "Filtered technicians by company retrieved successfully",
+          technicians: filteredTechnicians,
+        };
+      } catch (error) {
+        console.error("Error filtering technicians by company:", error);
+        return {
+          success: false,
+          message: "Failed to retrieve technicians by company",
+          technicians: [],
+        };
+      }
+    },
+
+    filterTechniciansByProfession: async (_, { profession }) => {
+      try {
+        const technicians = await Technician.findAll();
+        const filteredTechnicians = technicians.filter((technician) => {
+          return profession
+            ? technician.profession &&
+                technician.profession.toLowerCase() === profession.toLowerCase()
+            : true;
+        });
+
+        return {
+          success: true,
+          message: "Filtered technicians by profession retrieved successfully",
+          technicians: filteredTechnicians,
+        };
+      } catch (error) {
+        console.error("Error filtering technicians by profession:", error);
+        return {
+          success: false,
+          message: "Failed to retrieve technicians by profession",
+          technicians: [],
         };
       }
     },

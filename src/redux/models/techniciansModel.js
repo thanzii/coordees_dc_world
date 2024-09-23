@@ -17,7 +17,7 @@ const techniciansModel = {
     setSelectedTechnician: (state, payload) => {
       return { ...state, selectedTechnician: payload };
     },
-    resetModel() {
+    resetModel: () => {
       return initialState;
     },
   },
@@ -44,7 +44,7 @@ const techniciansModel = {
         const result = selectedTechnician
           ? await updateTechnician(selectedTechnician.id, { input: inputData })
           : await createTechnician({ input: inputData });
-
+        console.log("s>>", selectedTechnician, inputData);
         if (result && result.success) {
           console.log("Technician created/updated successfully:", result);
         } else {

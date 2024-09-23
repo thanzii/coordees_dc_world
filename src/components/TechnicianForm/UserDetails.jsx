@@ -85,7 +85,7 @@ export default function UserDetails({ register, errors }) {
         </div>
       </div>
       <div className="grid gap-6 mb-6 md:cols-span-2">
-        <div className="mb-6">
+        <div className="">
           <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
             Email address
           </span>
@@ -107,7 +107,7 @@ export default function UserDetails({ register, errors }) {
           )}
         </div>
         <div>
-          <span className="block  mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <span className="block text-sm mb-2 font-medium text-gray-900 dark:text-white">
             Date of Birth:
           </span>
           <input

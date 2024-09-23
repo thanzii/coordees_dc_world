@@ -8,12 +8,11 @@ import ProfessionalDetails from "./ProfessionalDetails";
 import next from "../../assets/next.svg";
 import previous from "../../assets/previous.svg";
 import Stepper from "../Stepper/Stepper";
-import ConfirmationPage from "../Confirmation/ConfirmationPage";
+import ConfirmationPage from "../TechnicianForm/Confirmation/ConfirmationPage";
 
 function TechnicianForm({ selectedTechnician }) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 2;
-  const [formData, setFormData] = useState(null);
   const {
     register,
     handleSubmit,
@@ -44,20 +43,13 @@ function TechnicianForm({ selectedTechnician }) {
     setCurrentStep((prevStep) => prevStep - 1);
   };
 
-  const handleFormSubmit = async (data) => {
-    try {
-      setFormData(data);
-      await onSubmit(data);
-      // setCurrentStep((prevStep) => prevStep);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
-  };
-
   return (
     <Layout>
       <div className="flex justify-center">
-        <form className="w-[70vw] h-auto p-6 bg-gradient-to-br from-stone-300 via-stone-200 to-stone-50 my-5 rounded-md shadow-md overflow-auto no-scrollbar relative">
+        <form
+          className="w-[70vw] h-auto p-6 bg-gradient-to-br from-stone-300 via-stone-200 to-stone-50 my-5 rounded-md shadow-md overflow-auto no-scrollbar relative"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div>
             <Stepper totalSteps={totalSteps} currentStep={currentStep} />
             {currentStep === 0 && (
@@ -70,9 +62,7 @@ function TechnicianForm({ selectedTechnician }) {
                 hasDrivingLicense={hasDrivingLicense}
               />
             )}
-            {currentStep === 2 && formData && (
-              <ConfirmationPage formData={formData} />
-            )}
+            {currentStep === 2 && <ConfirmationPage />}
           </div>
           <div className="flex justify-end">
             {currentStep > 0 && (
@@ -91,7 +81,6 @@ function TechnicianForm({ selectedTechnician }) {
               <button
                 type="submit"
                 className={`text-white bg-green-400 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
-                onClick={handleSubmit(handleFormSubmit)}
               >
                 {"Submit"}
               </button>

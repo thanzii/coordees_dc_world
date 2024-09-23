@@ -8,19 +8,35 @@ import {
 } from "@nextui-org/react";
 import filter from "../../../assets/filter.svg";
 import LocationFilter from "./LocationFilter/LocationFilter";
+import ProfessionFilter from "./ProfessionFilter/ProfessionFilter";
 
 function AdvanceFilterSearch({ onChange }) {
-  const [isLocationDropdown, setIsLocationDropdown] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedProfession, setSelectedProfession] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("");
 
-  const handleLocationDropdownToggle = () => {
-    setIsLocationDropdown(!isLocationDropdown);
+  const handleDropdownToggle = (dropdown) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
 
   const handleLocationChange = (selectedOption) => {
-    console.log("slllll2", selectedOption);
     setSelectedLocation(selectedOption);
-    onChange(selectedOption?.value);
+    console.log("s>>", selectedOption[0]);
+    onChange({
+      locations: selectedOption,
+      profession: selectedProfession,
+      company: selectedCompany,
+    });
+  };
+
+  const handleProfessionChange = (selectedOption) => {
+    setSelectedProfession(selectedOption);
+    onChange({
+      locations: selectedLocation,
+      profession: selectedOption,
+      company: selectedCompany,
+    });
   };
 
   return (
@@ -37,17 +53,27 @@ function AdvanceFilterSearch({ onChange }) {
         <DropdownMenu aria-label="menus">
           <DropdownItem
             aria-label="items"
-            onClick={handleLocationDropdownToggle}
+            onClick={() => handleDropdownToggle("location")}
           >
             Location
           </DropdownItem>
-          <DropdownItem>Profession</DropdownItem>
+          <DropdownItem
+            aria-label="items"
+            onClick={() => handleDropdownToggle("profession")}
+          >
+            Profession
+          </DropdownItem>
           <DropdownItem>Company</DropdownItem>
         </DropdownMenu>
       </Dropdown>
-      {isLocationDropdown && (
-        <div className="my-4">
+      {openDropdown === "location" && (
+        <div className="mt-1">
           <LocationFilter onSelect={handleLocationChange} />
+        </div>
+      )}
+      {openDropdown === "profession" && (
+        <div className="mt-1">
+          <ProfessionFilter onSelect={handleProfessionChange} />
         </div>
       )}
     </div>

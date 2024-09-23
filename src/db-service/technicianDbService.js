@@ -34,7 +34,7 @@ export async function updateTechnician({ technicianId, input }) {
             technicianInput: $input
           ) {
             id
-            succes
+            success
             message
           }
         }

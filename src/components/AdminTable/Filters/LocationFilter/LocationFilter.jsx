@@ -26,14 +26,21 @@ function LocationFilter({ onSelect }) {
 
   const options =
     searchData?.searchLocations?.map((location) => ({
-      value: { lat: location.lat, lon: location.lon },
+      value: {
+        lat: location.lat,
+        lon: location.lon,
+        display_name: location.display_name,
+      },
       label: location.display_name,
     })) || [];
 
   const handleLocationChange = (selectedOption) => {
-    setSelectedLocation(selectedOption);
-    onSelect(selectedOption);
+    setSelectedLocation(selectedOption?.value);
+    onSelect([selectedOption?.value]);
+    console.log("sosososososo", selectedOption?.value);
   };
+
+  console.log("slslslsl222", selectedLocation);
 
   return (
     <div>

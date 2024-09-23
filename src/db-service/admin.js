@@ -112,16 +112,64 @@ const SEARCH_LOCATIONS = gql`
   }
 `;
 
+const FILTER_TECHNICIANS_BY_PROFESSION = gql`
+  query filterTechniciansByProfession($profession: String!) {
+    filterTechniciansByProfession(profession: $profession) {
+      success
+      message
+      technicians {
+        firstName
+        lastName
+        email
+        phone
+        phoneWhatsapp
+        dateOfBirth
+        profession
+        company {
+          name
+        }
+        companyLicenseNo
+        companyLicenseFile {
+          fileName
+          mimeType
+          content
+        }
+        eId
+        eIdFile {
+          fileName
+          mimeType
+          content
+        }
+        drivingLicenseNo
+        drivingLicenseFile {
+          fileName
+          mimeType
+          content
+        }
+        location {
+          lat
+          lon
+          display_name
+        }
+      }
+    }
+  }
+`;
+
 const GET_FILTERED_TECHNICIANS = gql`
   query GetFilteredTechnicians(
     $page: Int
     $pageSize: Int
-    $locations: [LocationInput!]!
+    $locations: [LocationInput!]
+    $profession: String
+    $company: String
   ) {
     getFilteredTechnicians(
       page: $page
       pageSize: $pageSize
       locations: $locations
+      profession: $profession
+      company: $company
     ) {
       success
       message
@@ -185,4 +233,5 @@ export {
   FILTER_TECHNICIANS_BY_LOCATION,
   SEARCH_LOCATIONS,
   GET_FILTERED_TECHNICIANS,
+  FILTER_TECHNICIANS_BY_PROFESSION,
 };

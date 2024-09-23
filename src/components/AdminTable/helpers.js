@@ -49,17 +49,17 @@ const getDetails = (technician) => {
     { value: technician.phone },
     { value: technician.dateOfBirth },
     {
-      value: technician.eId,
+      value: `No: ${technician.eId}`,
       onDownload: () => handleDownload(technician?.eIdFile[0]),
     },
     { value: technician.hasDrivingLicense ? "Yes" : "No" },
     {
-      value: technician.drivingLicenseNo,
+      value: `No: ${technician.drivingLicenseNo}`,
       showDownload: technician?.hasDrivingLicense,
       onDownload: () => handleDownload(technician?.drivingLicenseFile[0]),
     },
     {
-      value: technician.companyLicenseNo,
+      value: `No: ${technician.companyLicenseNo}`,
       onDownload: () => handleDownload(technician?.companyLicenseFile[0]),
     },
   ];

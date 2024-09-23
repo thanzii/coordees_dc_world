@@ -1,18 +1,8 @@
 import React from "react";
-import view from "../../assets/view.svg";
+import view from "../../../assets/view.svg";
 
 function ConfirmationPage({ formData }) {
-  const renderLocations = () => {
-    if (formData && formData.location) {
-      return formData.location.map((loc, index) => (
-        <td key={index} className="border border-gray-400 p-2">
-          {loc.display_name}
-        </td>
-      ));
-    }
-    return <td className="border border-gray-400 p-2">N/A</td>;
-  };
-
+  console.log(formData);
   return (
     <div>
       <div className="p-5 m-5">
@@ -153,9 +143,8 @@ function ConfirmationPage({ formData }) {
             </tr>
             <tr>
               <th className="border border-gray-400 p-2">Location</th>
-              {renderLocations()}
+              {formData?.location?.display_name}
             </tr>
-            {console.log("formData", formData)}
           </tbody>
         </table>
       </div>

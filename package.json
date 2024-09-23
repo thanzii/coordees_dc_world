@@ -20,6 +20,7 @@
     "@apollo/client": "^3.10.3",
     "@apollo/server": "^4.10.4",
     "@babel/preset-env": "^7.24.5",
+    "@heroicons/react": "^1.0.6",
     "@nextui-org/chip": "^2.0.28",
     "@nextui-org/react": "^2.3.6",
     "@rematch/core": "^2.2.0",

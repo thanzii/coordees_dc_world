@@ -9,8 +9,8 @@ export default {
   ],
   theme: {
     extend: {
-      borderWidth: {
-        3: "3px",
+      fontFamily: {
+        hanken: ['"Hanken Grotesk"', "sans-serif"],
       },
     },
   },
