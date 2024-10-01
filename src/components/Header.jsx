@@ -86,7 +86,7 @@ function Header({ token, logout }) {
         </NavbarBrand>
 
         <NavbarContent justify="end">
-          <NavbarItem className="mx-4">
+          {/* <NavbarItem className="mx-4">
             <Link
               color="success"
               href="#"
@@ -119,7 +119,7 @@ function Header({ token, logout }) {
             >
               Services
             </Link>
-          </NavbarItem>
+          </NavbarItem> */}
 
           {isLoggedIn ? (
             <Dropdown aria-label="Dropdown" aria-labelledby="Dropdown">

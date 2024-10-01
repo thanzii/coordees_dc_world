@@ -227,247 +227,235 @@ function AdminTable({
               </tbody>
             ) : (
               <tbody className="table-row-group bg-stone-100">
-                {filters.locations || filters.profession || filters.company ? (
-                  Object.entries(groupedFilteredTechnicians).map(
-                    ([companyName, technicians]) => {
-                      return technicians.map((technician, index) => {
-                        const technicianDetails = getDetails(technician);
+                {filters.locations || filters.profession || filters.company
+                  ? Object.entries(groupedFilteredTechnicians).map(
+                      ([companyName, technicians]) => {
+                        return technicians.map((technician, index) => {
+                          const technicianDetails = getDetails(technician);
 
-                        return (
-                          <tr key={technician.id}>
-                            {/* Render table rows for filtered technicians */}
-                            {index === 0 ? (
-                              <td
-                                className="p-2 border border-gray-400"
-                                rowSpan={technicians.length}
-                              >
-                                {companyName}
-                              </td>
-                            ) : null}
-
-                            {technicianDetails.map(
-                              (
-                                {
-                                  value,
-                                  showDownload = true,
-                                  onDownload = false,
-                                },
-                                index
-                              ) => (
+                          return (
+                            <tr key={technician.id}>
+                              {/* Render table rows for filtered technicians */}
+                              {index === 0 ? (
                                 <td
-                                  key={index}
                                   className="p-2 border border-gray-400"
+                                  rowSpan={technicians.length}
                                 >
-                                  {value}
-                                  {showDownload && onDownload && (
-                                    <div className="flex flex-row">
-                                      <button
-                                        className="bg-gradient-to-bl from-green-500 via-green-400 to-green-300 hover:bg-gradient-to-tr hover:from-green-500 hover:via-green-400 hover:to-green-300 text-white p-2 rounded-md shadow-md text-lg"
-                                        onClick={onDownload}
-                                      >
-                                        <img src={file} alt="file" />
-                                      </button>
-                                    </div>
-                                  )}
+                                  {companyName}
                                 </td>
-                              )
-                            )}
+                              ) : null}
 
-                            <td className="p-2 border border-gray-400">
-                              <div className="flex flex-wrap gap-1">
-                                {technician?.location.map((loc, index) => (
-                                  <span
+                              {technicianDetails.map(
+                                (
+                                  {
+                                    value,
+                                    showDownload = true,
+                                    onDownload = false,
+                                  },
+                                  index
+                                ) => (
+                                  <td
                                     key={index}
-                                    className="px-2 py-1 bg-gray-200 rounded-md"
+                                    className="p-2 border border-gray-400"
                                   >
-                                    {loc.display_name}
-                                  </span>
-                                ))}
-                              </div>
-                            </td>
-                            <td className="flex mt-1">
-                              {technician.approvalStatus !== "Rejected" && (
-                                <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 hover:bg-gradient-to-tr hover:from-stone-300 hover:to-stone-400 rounded-md shadow-md">
-                                  {technician.approvalStatus ===
-                                    "Waiting_for_approval" && (
-                                    <img
-                                      src={check}
-                                      alt="coordeeslogo"
-                                      className="h-3 pr-2 my-2 mx-3"
-                                      onClick={() =>
-                                        onApproval(technician.id, "Approved")
-                                      }
-                                    />
-                                  )}
-                                  {technician.approvalStatus === "Approved" && (
-                                    <img
-                                      src={edit}
-                                      alt="coordeeslogo"
-                                      className="h-3 pr-2 my-2 mx-3"
-                                      onClick={() => {
-                                        setSelectedTechnician(technician);
-                                        setIsModalOpen(true);
-                                      }}
-                                    />
-                                  )}
-                                </div>
+                                    {value}
+                                    {showDownload && onDownload && (
+                                      <div className="flex flex-row">
+                                        <button
+                                          className="bg-gradient-to-bl from-green-500 via-green-400 to-green-300 hover:bg-gradient-to-tr hover:from-green-500 hover:via-green-400 hover:to-green-300 text-white p-2 rounded-md shadow-md text-lg"
+                                          onClick={onDownload}
+                                        >
+                                          <img src={file} alt="file" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </td>
+                                )
                               )}
-                              <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 rounded-md shadow-md">
-                                {technician.approvalStatus === "Approved" ||
-                                  (technician.approvalStatus !== "Rejected" && (
-                                    <img
-                                      src={close}
-                                      alt="coordeeslogo"
-                                      className="h-3 pr-1 my-2 mx-3"
-                                      onClick={() =>
-                                        onApproval(technician.id, "Rejected")
-                                      }
-                                    />
-                                  ))}
-                                {technician.approvalStatus !==
-                                  "Waiting_for_approval" && (
-                                  <img
-                                    src={delete1}
-                                    alt="coordeeslogo"
-                                    className="h-3 pr-1 my-2 mx-3"
-                                    onClick={() => onDelete(technician.id)}
-                                  />
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      });
-                    }
-                  )
-                ) : isLoading ? (
-                  <tbody>
-                    <tr>
-                      <td colSpan={13} className="p-4">
-                        <div className=" flex justify-center items-center">
-                          <img
-                            src={coordeesLogo}
-                            alt="coordeesLogo"
-                            className="animate-spin h-8 w-8"
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                ) : (
-                  Object.entries(groupedTechnicians).map(
-                    ([companyName, technicians]) => {
-                      return technicians.map((technician, index) => {
-                        const technicianDetails = getDetails(technician);
 
-                        return (
-                          <tr key={technician.id}>
-                            {/* Render table rows for all technicians */}
-                            {index === 0 ? (
-                              <td
-                                className="border border-gray-400 px-2"
-                                rowSpan={technicians.length}
-                              >
-                                {companyName}
+                              <td className="p-2 border border-gray-400">
+                                <div className="flex flex-wrap gap-1">
+                                  {technician?.location.map((loc, index) => (
+                                    <span
+                                      key={index}
+                                      className="px-2 py-1 bg-gray-200 rounded-md"
+                                    >
+                                      {loc.display_name}
+                                    </span>
+                                  ))}
+                                </div>
                               </td>
-                            ) : null}
-
-                            {technicianDetails.map(
-                              (
-                                {
-                                  value,
-                                  showDownload = true,
-                                  onDownload = false,
-                                },
-                                index
-                              ) => (
-                                <td
-                                  key={index}
-                                  className="border border-gray-400 px-2"
-                                >
-                                  {value}
-                                  {showDownload && onDownload && (
-                                    <div className="flex justify-start">
-                                      <button
-                                        className="px-2 py-1 bg-gradient-to-bl from-green-500 via-green-400 to-green-300 hover:bg-gradient-to-tr hover:from-green-500 hover:via-green-400 hover:to-green-300 text-white rounded-md shadow-md text-lg"
-                                        onClick={onDownload}
-                                      >
-                                        Download
-                                      </button>
-                                    </div>
-                                  )}
-                                </td>
-                              )
-                            )}
-
-                            <td className="border border-gray-400 px-2">
-                              <div className="flex flex-wrap">
-                                {technician?.location.map((loc, index) => (
-                                  <span
-                                    key={index}
-                                    className=" bg-gray-200 rounded-md"
-                                  >
-                                    {loc.display_name}
-                                  </span>
-                                ))}
-                              </div>
-                            </td>
-                            <td className="flex">
-                              {technician.approvalStatus !== "Rejected" && (
-                                <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 hover:bg-gradient-to-tr hover:from-stone-300 hover:to-stone-400 rounded-md shadow-md">
-                                  {technician.approvalStatus ===
+                              <td className="flex mt-1">
+                                {technician.approvalStatus !== "Rejected" && (
+                                  <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 hover:bg-gradient-to-tr hover:from-stone-300 hover:to-stone-400 rounded-md shadow-md">
+                                    {technician.approvalStatus ===
+                                      "Waiting_for_approval" && (
+                                      <img
+                                        src={check}
+                                        alt="coordeeslogo"
+                                        className="h-3 pr-2 my-2 mx-3"
+                                        onClick={() =>
+                                          onApproval(technician.id, "Approved")
+                                        }
+                                      />
+                                    )}
+                                    {technician.approvalStatus ===
+                                      "Approved" && (
+                                      <img
+                                        src={edit}
+                                        alt="coordeeslogo"
+                                        className="h-3 pr-2 my-2 mx-3"
+                                        onClick={() => {
+                                          setSelectedTechnician(technician);
+                                          setIsModalOpen(true);
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                                <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 rounded-md shadow-md">
+                                  {technician.approvalStatus === "Approved" ||
+                                    (technician.approvalStatus !==
+                                      "Rejected" && (
+                                      <img
+                                        src={close}
+                                        alt="coordeeslogo"
+                                        className="h-3 pr-1 my-2 mx-3"
+                                        onClick={() =>
+                                          onApproval(technician.id, "Rejected")
+                                        }
+                                      />
+                                    ))}
+                                  {technician.approvalStatus !==
                                     "Waiting_for_approval" && (
                                     <img
-                                      src={check}
+                                      src={delete1}
                                       alt="coordeeslogo"
-                                      className="h-3"
-                                      onClick={() =>
-                                        onApproval(technician.id, "Approved")
-                                      }
-                                    />
-                                  )}
-                                  {technician.approvalStatus === "Approved" && (
-                                    <img
-                                      src={edit}
-                                      alt="coordeeslogo"
-                                      className="h-3 pr-2 my-2 mx-3"
-                                      onClick={() => {
-                                        setSelectedTechnician(technician);
-                                        setIsModalOpen(true);
-                                      }}
+                                      className="h-3 pr-1 my-2 mx-3"
+                                      onClick={() => onDelete(technician.id)}
                                     />
                                   )}
                                 </div>
+                              </td>
+                            </tr>
+                          );
+                        });
+                      }
+                    )
+                  : Object.entries(groupedTechnicians).map(
+                      ([companyName, technicians]) => {
+                        return technicians.map((technician, index) => {
+                          const technicianDetails = getDetails(technician);
+
+                          return (
+                            <tr key={technician.id}>
+                              {/* Render table rows for all technicians */}
+                              {index === 0 ? (
+                                <td
+                                  className="border border-gray-400 px-2"
+                                  rowSpan={technicians.length}
+                                >
+                                  {companyName}
+                                </td>
+                              ) : null}
+
+                              {technicianDetails.map(
+                                (
+                                  {
+                                    value,
+                                    showDownload = true,
+                                    onDownload = false,
+                                  },
+                                  index
+                                ) => (
+                                  <td
+                                    key={index}
+                                    className="border border-gray-400 px-2"
+                                  >
+                                    {value}
+                                    {showDownload && onDownload && (
+                                      <div className="flex justify-start">
+                                        <button
+                                          className="px-2 py-1 bg-gradient-to-bl from-green-500 via-green-400 to-green-300 hover:bg-gradient-to-tr hover:from-green-500 hover:via-green-400 hover:to-green-300 text-white rounded-md shadow-md text-lg"
+                                          onClick={onDownload}
+                                        >
+                                          Download
+                                        </button>
+                                      </div>
+                                    )}
+                                  </td>
+                                )
                               )}
-                              <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 rounded-md shadow-md">
-                                {technician.approvalStatus === "Approved" ||
-                                  (technician.approvalStatus !== "Rejected" && (
+
+                              <td className="border border-gray-400 px-2">
+                                <div className="flex flex-wrap">
+                                  {technician?.location.map((loc, index) => (
+                                    <span
+                                      key={index}
+                                      className=" bg-gray-200 rounded-md"
+                                    >
+                                      {loc.display_name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="flex mt-1">
+                                {technician.approvalStatus !== "Rejected" && (
+                                  <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 hover:bg-gradient-to-tr hover:from-stone-300 hover:to-stone-400 rounded-md shadow-md">
+                                    {technician.approvalStatus ===
+                                      "Waiting_for_approval" && (
+                                      <img
+                                        src={check}
+                                        alt="coordeeslogo"
+                                        className="h-3 pr-2 my-2 mx-3"
+                                        onClick={() =>
+                                          onApproval(technician.id, "Approved")
+                                        }
+                                      />
+                                    )}
+                                    {technician.approvalStatus ===
+                                      "Approved" && (
+                                      <img
+                                        src={edit}
+                                        alt="coordeeslogo"
+                                        className="h-3 pr-2 my-2 mx-3"
+                                        onClick={() => {
+                                          setSelectedTechnician(technician);
+                                          setIsModalOpen(true);
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                                <div className="py-2 pr-2 m-4 cursor-pointer bg-gradient-to-bl from-stone-400 to-stone-300 rounded-md shadow-md">
+                                  {technician.approvalStatus === "Approved" ||
+                                    (technician.approvalStatus !==
+                                      "Rejected" && (
+                                      <img
+                                        src={close}
+                                        alt="coordeeslogo"
+                                        className="h-3 pr-1 my-2 mx-3"
+                                        onClick={() =>
+                                          onApproval(technician.id, "Rejected")
+                                        }
+                                      />
+                                    ))}
+                                  {technician.approvalStatus !==
+                                    "Waiting_for_approval" && (
                                     <img
-                                      src={close}
+                                      src={delete1}
                                       alt="coordeeslogo"
                                       className="h-3 pr-1 my-2 mx-3"
-                                      onClick={() =>
-                                        onApproval(technician.id, "Rejected")
-                                      }
+                                      onClick={() => onDelete(technician.id)}
                                     />
-                                  ))}
-                                {technician.approvalStatus !==
-                                  "Waiting_for_approval" && (
-                                  <img
-                                    src={delete1}
-                                    alt="coordeeslogo"
-                                    className="h-3 pr-1 my-2 mx-3"
-                                    onClick={() => onDelete(technician.id)}
-                                  />
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      });
-                    }
-                  )
-                )}
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        });
+                      }
+                    )}
               </tbody>
             )}
           </table>

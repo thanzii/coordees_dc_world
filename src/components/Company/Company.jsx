@@ -75,6 +75,7 @@ function Company({ company, setCompany }) {
         value={company}
         onChange={(value) => setCompany(value)}
         placeholder="Search Company Name"
+        defaultValue={{}}
       />
     </div>
   );

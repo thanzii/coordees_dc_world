@@ -14,58 +14,57 @@ function Homepage({}) {
   return (
     <Layout>
       {/* Background and Main Container */}
-      <div
+      {/* <div
         className="relative bg-cover bg-center bg-green-100 min-h-screen"
         style={{ backgroundImage: `url(${coordeesSmallBlur})` }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white backdrop-blur-sm"></div>
-        <div className="relative flex items-center justify-center min-h-screen">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-10 p-10">
-            {/* Left Side Card */}
-            <div className="bg-white/60 backdrop-blur-md shadow-xl rounded-lg p-10 text-left md:w-1/2">
-              <h1 className="text-3xl font-hanken font-bold mb-8 gradient-underline">
-                WHAT DO YOU NEED TO FIND?
-              </h1>
-              <p className="text-lg mb-3 font-medium font-hanken">
-                Just send Hi to our WhatsApp number and get instant access to
-                trusted services—no calls required!
-              </p>
-              <p className="text-lg mb-3 font-hanken">
-                Coordees, powered by Astech Group, is your go-to service
-                provider for all household and institutional needs. Whether it’s
-                a CCTV technician, plumber, or electrician, we’ve got you
-                covered.
-              </p>
-              <p className="text-lg font-hanken mb-4">
-                With Coordees, booking a reliable neighborhood technician is as
-                easy as sending a message. We coordinate with local experts to
-                ensure fast and efficient repairs or installations, all within a
-                few minutes.
-              </p>
-              <p className="font-semibold font-hanken">
-                No hassle, no long waits—just WhatsApp us, and we’ll take care
-                of the rest.
-              </p>
-              <Button
-                className="bg-[#2cbc61] text-white font-hanken mt-4"
-                onClick={() => navigate("/contact")}
-              >
-                Contact Us
-              </Button>
-            </div>
+      > */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white backdrop-blur-sm"></div>
+      <div className="relative flex items-center justify-center min-h-screen">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-10 p-10">
+          {/* Left Side Card */}
+          <div className="bg-white/60 backdrop-blur-md shadow-xl rounded-lg p-10 text-left md:w-1/2">
+            <h1 className="text-3xl font-hanken font-bold mb-8 gradient-underline">
+              WHAT DO YOU NEED TO FIND?
+            </h1>
+            <p className="text-lg mb-3 font-medium font-hanken">
+              Just send Hi to our WhatsApp number and get instant access to
+              trusted services—no calls required!
+            </p>
+            <p className="text-lg mb-3 font-hanken">
+              Coordees, powered by Astech Group, is your go-to service provider
+              for all household and institutional needs. Whether it’s a CCTV
+              technician, plumber, or electrician, we’ve got you covered.
+            </p>
+            <p className="text-lg font-hanken mb-4">
+              With Coordees, booking a reliable neighborhood technician is as
+              easy as sending a message. We coordinate with local experts to
+              ensure fast and efficient repairs or installations, all within a
+              few minutes.
+            </p>
+            <p className="font-semibold font-hanken">
+              No hassle, no long waits—just WhatsApp us, and we’ll take care of
+              the rest.
+            </p>
+            <Button
+              className="bg-[#2cbc61] text-white font-hanken mt-4"
+              onClick={() => navigate("/contact")}
+            >
+              Contact Us
+            </Button>
+          </div>
 
-            <div className="hidden md:block md:w-1/3">
-              <Image
-                src={technicianImg}
-                alt="Coordees services"
-                width="100%"
-                height="auto"
-                className="rounded-br-[250px]"
-              />
-            </div>
+          <div className="hidden md:block md:w-1/3">
+            <Image
+              src={technicianImg}
+              alt="Coordees services"
+              width="100%"
+              height="auto"
+              className="rounded-br-[250px]"
+            />
           </div>
         </div>
       </div>
+      {/* </div> */}
 
       {/* Second Div with Left and Right Sections */}
       <div className="flex flex-col md:flex-row justify-between items-start py-12 px-32">

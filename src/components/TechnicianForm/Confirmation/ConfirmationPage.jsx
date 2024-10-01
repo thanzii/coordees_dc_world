@@ -1,8 +1,9 @@
 import React from "react";
 import view from "../../../assets/view.svg";
 
-function ConfirmationPage({ formData }) {
-  console.log(formData);
+function ConfirmationPage({ getValues }) {
+  console.log("formData", getValues());
+  const formData = getValues();
   return (
     <div>
       <div className="p-5 m-5">
@@ -114,33 +115,37 @@ function ConfirmationPage({ formData }) {
             <tr>
               <th className="border border-gray-400 p-2">Driving License</th>
               <td className="border border-gray-400 p-2">
-                {formData?.hasDrivingLicense === true ? "Yes" : "No"}
+                {formData?.hasDrivingLicense ? "Yes" : "No"}
               </td>
             </tr>
-            <tr>
-              <th className="border border-gray-400 p-2">
-                Driving License No.
-              </th>
-              <td className="border border-gray-400 p-2">
-                {formData?.drivingLicenseNo}
-              </td>
-            </tr>
-            <tr>
-              <th className="border border-gray-400 p-2">
-                Driving License File
-              </th>
-              <td className="border border-gray-400 p-2">
-                <div className="flex justify-between">
-                  {formData?.drivingLicenseFile?.fileName}
-                  <button
-                    className="bg-green-400 rounded-md shadow-md cursor-pointer p-2"
-                    onClick={() => window.open()}
-                  >
-                    <img src={view} />
-                  </button>
-                </div>
-              </td>
-            </tr>
+            {formData?.hasDrivingLicense && (
+              <tr>
+                <th className="border border-gray-400 p-2">
+                  Driving License No.
+                </th>
+                <td className="border border-gray-400 p-2">
+                  {formData?.drivingLicenseNo}
+                </td>
+              </tr>
+            )}
+            {formData?.hasDrivingLicense && (
+              <tr>
+                <th className="border border-gray-400 p-2">
+                  Driving License File
+                </th>
+                <td className="border border-gray-400 p-2">
+                  <div className="flex justify-between">
+                    {formData?.drivingLicenseFile?.fileName}
+                    <button
+                      className="bg-green-400 rounded-md shadow-md cursor-pointer p-2"
+                      onClick={() => window.open()}
+                    >
+                      <img src={view} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )}
             <tr>
               <th className="border border-gray-400 p-2">Location</th>
               {formData?.location?.display_name}

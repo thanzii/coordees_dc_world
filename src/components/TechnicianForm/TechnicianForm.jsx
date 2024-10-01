@@ -10,10 +10,11 @@ import previous from "../../assets/previous.svg";
 import Stepper from "../Stepper/Stepper";
 import ConfirmationPage from "../TechnicianForm/Confirmation/ConfirmationPage";
 
-function TechnicianForm({ selectedTechnician }) {
+function TechnicianForm({ selectedTechnician, setSelectedTechnician }) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 2;
   const {
+    getValues,
     register,
     handleSubmit,
     setValue,
@@ -24,6 +25,12 @@ function TechnicianForm({ selectedTechnician }) {
   });
 
   const hasDrivingLicense = watch("hasDrivingLicense");
+
+  useEffect(() => {
+    return () => {
+      setSelectedTechnician(null);
+    };
+  }, []);
 
   useEffect(() => {
     if (selectedTechnician) {
@@ -62,7 +69,7 @@ function TechnicianForm({ selectedTechnician }) {
                 hasDrivingLicense={hasDrivingLicense}
               />
             )}
-            {currentStep === 2 && <ConfirmationPage />}
+            {currentStep === 2 && <ConfirmationPage getValues={getValues} />}
           </div>
           <div className="flex justify-end">
             {currentStep > 0 && (
@@ -96,4 +103,8 @@ const mapStateToProps = ({ techniciansModel: { selectedTechnician } }) => ({
   selectedTechnician,
 });
 
-export default connect(mapStateToProps)(TechnicianForm);
+const mapDispatchToProps = ({
+  techniciansModel: { setSelectedTechnician },
+}) => ({ setSelectedTechnician });
+
+export default connect(mapStateToProps, mapDispatchToProps)(TechnicianForm);
