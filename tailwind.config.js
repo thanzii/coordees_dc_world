@@ -18,7 +18,7 @@ export default {
   plugins: [
     nextui({
       prefix: "nextui",
-      addCommonColors: false,
+      addCommonColors: true,
       defaultTheme: "light",
       defaultExtendTheme: "light",
       layout: {},
@@ -33,6 +33,6 @@ export default {
         },
       },
     }),
-    require("@tailwindcss/forms"),
+    // require("@tailwindcss/forms"),
   ],
 };
