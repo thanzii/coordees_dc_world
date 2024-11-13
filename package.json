@@ -30,6 +30,7 @@
     "axios": "^1.6.8",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
     "esm": "^3.2.25",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
@@ -81,7 +82,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react": "^7.37.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7"
   }

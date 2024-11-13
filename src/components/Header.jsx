@@ -39,41 +39,6 @@ function Header({ token, logout }) {
     logout().then(() => navigate("/", { replace: true }));
 
   return (
-    // <div className="flex hcard justify-between">
-    //   <img
-    //     src={coordeesLogoExpand}
-    //     alt="coordeeslogo"
-    //     className="h-12 my-2 mx-3"
-    //   />
-    //   <div className="relative">
-    //     <div className="absolute top-0 right-0 p-3">
-    //       <Dropdown aria-label="Dropdown" aria-labelledby="Dropdown">
-    //         <DropdownTrigger>
-    //           <Avatar
-    //             icon={<AvatarIcon />}
-    //             classNames={{
-    //               base: "bg-gradient-to-br from-[#8eebb0] to-[#2cbc61]",
-    //               icon: "text-white/80",
-    //             }}
-    //             isFocusable={true}
-    //           />
-    //         </DropdownTrigger>
-    //         <DropdownMenu
-    //           aria-label="Dropdown menu"
-    //           aria-labelledby="Dropdown menu"
-    //         >
-    //           <DropdownItem
-    //             key="log out"
-    //             onClick={handleLogout}
-    //             startContent={<LogoutIcon />}
-    //           >
-    //             Log Out
-    //           </DropdownItem>
-    //         </DropdownMenu>
-    //       </Dropdown>
-    //     </div>
-    //   </div>
-    // </div>
     <>
       <Navbar isBordered maxWidth="full">
         <NavbarBrand>
@@ -86,41 +51,6 @@ function Header({ token, logout }) {
         </NavbarBrand>
 
         <NavbarContent justify="end">
-          {/* <NavbarItem className="mx-4">
-            <Link
-              color="success"
-              href="#"
-              aria-current="page"
-              className={`text-md font-hanken hover:text-[#2cbc61] ${getActiveLinkClass(
-                "/"
-              )}`}
-            >
-              Home
-            </Link>
-          </NavbarItem>
-          <NavbarItem className="mx-4">
-            <Link
-              href="#"
-              color="foreground"
-              className={`text-md font-hanken hover:text-[#2cbc61] ${getActiveLinkClass(
-                "/about"
-              )}`}
-            >
-              About
-            </Link>
-          </NavbarItem>
-          <NavbarItem className="ml-4 mr-12">
-            <Link
-              color="foreground"
-              href="#"
-              className={`text-md font-hanken hover:text-[#2cbc61] ${getActiveLinkClass(
-                "/services"
-              )}`}
-            >
-              Services
-            </Link>
-          </NavbarItem> */}
-
           {isLoggedIn ? (
             <Dropdown aria-label="Dropdown" aria-labelledby="Dropdown">
               <DropdownTrigger>
@@ -154,9 +84,6 @@ function Header({ token, logout }) {
                   className="border-[#2cbc61] border-1 text-[#2cbc61] bg-transparent text-md font-hanken"
                 >
                   Login
-                  {/* <div>
-                    <img alt="login" src={loginIcon} />
-                  </div> */}
                 </Button>
               </NavbarItem>
 
@@ -168,9 +95,6 @@ function Header({ token, logout }) {
                   className="border-[#2cbc61] border-1 text-white text-md font-hanken bg-[#2cbc61]"
                 >
                   Sign Up
-                  {/* <div>
-                    <img alt="sign-up" src={addUser} />
-                  </div> */}
                 </Button>
               </NavbarItem>
             </>

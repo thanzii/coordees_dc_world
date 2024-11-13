@@ -1,13 +1,8 @@
-import { DataTypes, Sequelize } from "sequelize";
-import mysql2 from "mysql2";
+// models/companyModel.js
+import { DataTypes } from "sequelize";
+import { sequelize } from "./technicianModel.js"; // Reuse the sequelize instance
 
-const sequelize = new Sequelize("coordeesdc", "root", "Password", {
-  host: "localhost",
-  port: 3306,
-  dialect: "mysql",
-  dialectModule: mysql2,
-});
-
+// Define the Company model
 export const Company = sequelize.define(
   "Company",
   {
@@ -17,17 +12,9 @@ export const Company = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    name: {
-      type: DataTypes.STRING,
-    },
+    name: { type: DataTypes.STRING },
+    companyLicenseNo: { type: DataTypes.STRING },
+    companyLicenseFile: { type: DataTypes.JSON },
   },
   { timestamps: true }
 );
-sequelize
-  .sync()
-  .then(() => {
-    console.log("Database and table created");
-  })
-  .catch((error) => {
-    console.error("Error synchronising the database:", error);
-  });

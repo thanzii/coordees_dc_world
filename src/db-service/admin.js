@@ -7,8 +7,15 @@ const GET_TECHNICIANS = gql`
       message
       technicians {
         id
-        company {
+        company
+        Company {
           name
+          companyLicenseNo
+          companyLicenseFile {
+            fileName
+            mimeType
+            content
+          }
         }
         firstName
         lastName
@@ -18,12 +25,6 @@ const GET_TECHNICIANS = gql`
         dateOfBirth
         eId
         eIdFile {
-          fileName
-          mimeType
-          content
-        }
-        companyLicenseNo
-        companyLicenseFile {
           fileName
           mimeType
           content
@@ -125,15 +126,7 @@ const FILTER_TECHNICIANS_BY_PROFESSION = gql`
         phoneWhatsapp
         dateOfBirth
         profession
-        company {
-          name
-        }
-        companyLicenseNo
-        companyLicenseFile {
-          fileName
-          mimeType
-          content
-        }
+        company
         eId
         eIdFile {
           fileName
@@ -175,9 +168,7 @@ const GET_FILTERED_TECHNICIANS = gql`
       message
       technicians {
         id
-        company {
-          name
-        }
+        company
         firstName
         lastName
         email
@@ -186,12 +177,6 @@ const GET_FILTERED_TECHNICIANS = gql`
         dateOfBirth
         eId
         eIdFile {
-          fileName
-          mimeType
-          content
-        }
-        companyLicenseNo
-        companyLicenseFile {
           fileName
           mimeType
           content

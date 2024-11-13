@@ -27,7 +27,6 @@ const techniciansModel = {
         mapModel: { selectedLocation },
         techniciansModel: { company, selectedTechnician },
       } = state;
-
       inputData.location = Object.values(selectedLocation).map(
         ({ value: { lat, lon, display_name } }) => ({
           lat: parseFloat(lat),
@@ -36,15 +35,11 @@ const techniciansModel = {
         })
       );
 
-      inputData.company = company
-        ? { id: company.value, name: company.label }
-        : null;
-
+      inputData.company = inputData.company.id;
       try {
         const result = selectedTechnician
           ? await updateTechnician(selectedTechnician.id, { input: inputData })
           : await createTechnician({ input: inputData });
-        console.log("s>>", selectedTechnician, inputData);
         if (result && result.success) {
           console.log("Technician created/updated successfully:", result);
         } else {

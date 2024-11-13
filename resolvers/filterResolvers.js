@@ -65,7 +65,7 @@ export const filterResolvers = {
                 selectedLocation.lat,
                 selectedLocation.lon
               );
-              return distance <= 5; // Adjust the radius as needed
+              return distance <= 5;
             });
           });
         });
@@ -124,7 +124,6 @@ export const filterResolvers = {
         });
 
         const totalFilteredTechnicians = filteredTechnicians.length;
-        console.log("fttt>>", filteredTechnicians);
         return {
           success: true,
           message: "Filtered technicians retrieved successfully",

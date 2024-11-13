@@ -1,9 +1,12 @@
+import { parseDate } from "@internationalized/date";
 import {
   createTechnician,
   updateTechnician,
 } from "../../db-service/technicianDbService";
 import { dispatch, getState } from "../../redux/store";
+import { CalendarDate } from "@internationalized/date";
 
+// Default values for each step in the form
 const getDefaultValues = (currentStep) => {
   switch (currentStep) {
     case 0:
@@ -13,7 +16,7 @@ const getDefaultValues = (currentStep) => {
         phoneWhatsapp: "",
         phone: "",
         email: "",
-        dateOfBirth: "",
+        dateOfBirth: parseDate("1995-01-01"),
       };
     case 1:
       return {
@@ -23,11 +26,20 @@ const getDefaultValues = (currentStep) => {
           mimeType: "",
           content: "",
         },
-        companyLicenseNo: "",
-        companyLicenseFile: {
-          fileName: "",
-          mimeType: "",
-          content: "",
+        // companyLicenseNo: "",
+        // companyLicenseFile: {
+        //   fileName: "",
+        //   mimeType: "",
+        //   content: "",
+        // },
+        company: {
+          name: "",
+          companyLicenseNo: "",
+          companyLicenseFile: {
+            fileName: "",
+            mimeType: "",
+            content: "",
+          },
         },
         profession: "",
         supportFile: {
@@ -57,11 +69,20 @@ const getDefaultValues = (currentStep) => {
           mimeType: "",
           content: "",
         },
-        companyLicenseNo: "",
-        companyLicenseFile: {
-          fileName: "",
-          mimeType: "",
-          content: "",
+        // companyLicenseNo: "",
+        // companyLicenseFile: {
+        //   fileName: "",
+        //   mimeType: "",
+        //   content: "",
+        // },
+        company: {
+          name: "",
+          companyLicenseNo: "",
+          companyLicenseFile: {
+            fileName: "",
+            mimeType: "",
+            content: "",
+          },
         },
         profession: "",
         supportFile: {
@@ -82,6 +103,7 @@ const getDefaultValues = (currentStep) => {
   }
 };
 
+// Utility to read file asynchronously
 const readFileAsync = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -94,32 +116,73 @@ const readFileAsync = (file) => {
       reject(error);
     };
 
-    reader.readAsDataURL(file);
+    if (file instanceof Blob) {
+      reader.readAsDataURL(file); // Read the file as data URL
+    } else {
+      reject(new Error("File is not a valid Blob"));
+    }
   });
 };
 
+// Function to extract file information (name, type, content)
 const extractFileInfo = async (file) => {
-  const fileContent = await readFileAsync(file);
-  return {
-    fileName: file.name,
-    mimeType: file.type,
-    content: fileContent.split(",")[1],
-  };
+  if (!file) return null; // If no file is provided, return null
+
+  try {
+    const fileContent = await readFileAsync(file);
+    return {
+      fileName: file.name,
+      mimeType: file.type,
+      content: fileContent.split(",")[1], // Extract base64 content from data URL
+    };
+  } catch (error) {
+    console.error("Error reading file:", error);
+    return null;
+  }
 };
 
+export const formatDate = (date) => {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+// Main function to handle form submission
 const onSubmit = async (data) => {
   try {
-    data.eIdFile = (await extractFileInfo(data?.eIdFile[0])) ?? null;
+    // Ensure dateOfBirth is properly formatted if it's a CalendarDate instance
+    if (data?.dateOfBirth instanceof CalendarDate) {
+      data.dateOfBirth = formatDate(data?.dateOfBirth);
+    }
 
-    data.companyLicenseFile =
-      (await extractFileInfo(data?.companyLicenseFile[0])) ?? null;
+    // Extract file info if files are present
+    if (data?.eIdFile && data?.eIdFile instanceof File) {
+      data.eIdFile = await extractFileInfo(data?.eIdFile);
+    }
 
+    if (
+      data?.company?.companyLicenseFile &&
+      data?.company.companyLicenseFile instanceof File
+    ) {
+      data.company.companyLicenseFile = await extractFileInfo(
+        data.company.companyLicenseFile
+      );
+    }
+
+    if (data?.drivingLicenseFile && data?.drivingLicenseFile instanceof File) {
+      data.drivingLicenseFile = await extractFileInfo(data?.drivingLicenseFile);
+    }
+
+    if (data?.supportFile && data?.supportFile instanceof File) {
+      data.supportFile = await extractFileInfo(data?.supportFile);
+    }
+
+    // Convert hasDrivingLicense to boolean if it's a string
     data.hasDrivingLicense = data.hasDrivingLicense === "true";
-    data.drivingLicenseFile =
-      (await extractFileInfo(data?.drivingLicenseFile[0])) ?? null;
 
-    data.supportFile = (await extractFileInfo(data?.supportFile[0])) ?? null;
-
+    // Dispatch the action to create or update technician
     dispatch.techniciansModel.createOrUpdateTechnician(data);
   } catch (error) {
     console.error("Error creating/updating technician", error);

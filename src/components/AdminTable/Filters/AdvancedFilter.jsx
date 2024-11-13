@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Button,
   Dropdown,
@@ -6,9 +5,10 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
-import filter from "../../../assets/filter.svg";
+import React, { useState } from "react";
 import LocationFilter from "./LocationFilter/LocationFilter";
 import ProfessionFilter from "./ProfessionFilter/ProfessionFilter";
+import { MdFilterListAlt as FilterIcon } from "react-icons/md";
 
 function AdvanceFilterSearch({ onChange }) {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -22,7 +22,6 @@ function AdvanceFilterSearch({ onChange }) {
 
   const handleLocationChange = (selectedOption) => {
     setSelectedLocation(selectedOption);
-    console.log("s>>", selectedOption[0]);
     onChange({
       locations: selectedOption,
       profession: selectedProfession,
@@ -43,12 +42,16 @@ function AdvanceFilterSearch({ onChange }) {
     <div>
       <Dropdown>
         <DropdownTrigger>
-          <Button
+          <Button isIconOnly size="sm" variant="bordered">
+            <FilterIcon size="1.3rem" color="#17C964" />
+          </Button>
+          {/* <Button
             variant="bordered"
-            className="bg-gradient-to-tr from-green-50 via-green-100 to-green-200 hover:bg-gradient-to-bl hover:from-green-200 hover:via-green-100 hover:to-green-50"
+            className=''
           >
             <img className="max-w-6" src={filter} alt="filter-icon" />
-          </Button>
+            <FilterIcon />
+          </Button> */}
         </DropdownTrigger>
         <DropdownMenu aria-label="menus">
           <DropdownItem

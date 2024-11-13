@@ -41,26 +41,29 @@ const handleDownload = (file) => {
 const getDetails = (technician) => {
   return [
     {
-      value: `${technician.firstName} ${technician.lastName}`,
+      id: "technician",
+      value: {
+        name: `${technician.firstName} ${technician.lastName}`,
+        email: technician.email,
+        phone: technician.phone,
+        dob: technician.dateOfBirth
+          ? technician.dateOfBirth.split("T")[0]
+          : null,
+      },
+      onDownload: () => handleDownload(technician?.companyLicenseFile[0]),
     },
-    { value: technician.email },
-    { value: technician.profession },
-    { value: technician.phoneWhatsapp },
-    { value: technician.phone },
-    { value: technician.dateOfBirth },
+    { id: "profession", value: technician.profession },
+    { id: "whatsapp", value: technician.phoneWhatsapp },
     {
-      value: `No: ${technician.eId}`,
+      id: "eId",
+      value: technician.eId,
       onDownload: () => handleDownload(technician?.eIdFile[0]),
     },
-    { value: technician.hasDrivingLicense ? "Yes" : "No" },
     {
-      value: `No: ${technician.drivingLicenseNo}`,
+      id: "dl",
+      value: technician.hasDrivingLicense ? technician.drivingLicenseNo : "No",
       showDownload: technician?.hasDrivingLicense,
       onDownload: () => handleDownload(technician?.drivingLicenseFile[0]),
-    },
-    {
-      value: `No: ${technician.companyLicenseNo}`,
-      onDownload: () => handleDownload(technician?.companyLicenseFile[0]),
     },
   ];
 };
@@ -151,4 +154,5 @@ export {
   handleApprovalAction,
   handleDelete,
   sendApprovalMailAction,
+  handleDownload,
 };

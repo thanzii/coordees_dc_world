@@ -37,10 +37,7 @@ function LocationFilter({ onSelect }) {
   const handleLocationChange = (selectedOption) => {
     setSelectedLocation(selectedOption?.value);
     onSelect([selectedOption?.value]);
-    console.log("sosososososo", selectedOption?.value);
   };
-
-  console.log("slslslsl222", selectedLocation);
 
   return (
     <div>

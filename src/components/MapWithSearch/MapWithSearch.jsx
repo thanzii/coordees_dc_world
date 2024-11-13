@@ -12,12 +12,9 @@ import {
   setCurrentLocation,
 } from "./helpers";
 import { dispatch } from "../../redux/store";
+import { Controller } from "react-hook-form";
 
-const MapWithSearch = ({
-  isLocationsLoading,
-  locations,
-  selectedLocations,
-}) => {
+const MapWithSearch = ({ isLocationsLoading, control }) => {
   const [map, setMap] = useState(null);
 
   useEffect(() => {
@@ -54,33 +51,64 @@ const MapWithSearch = ({
   return (
     <div>
       <div>
-        <div
-          id="map"
-          className="rounded-md shadow-md my-3"
-          style={{ width: "100%", height: "250px" }}
-        ></div>
-        <AsyncSelect
-          isMulti
-          isClearable
-          isSearchable
-          loadOptions={loadOptions}
-          onChange={(location) => handleSelectLocation({ map, location })}
-          getOptionLabel={(option) => option.label}
-          getOptionValue={(option) => option.value}
-          placeholder="Search for a location"
-          isLoading={isLocationsLoading}
-        />
+        <div className="bg-white border-1 rounded-xl mt-1">
+          <div
+            id="map"
+            className="rounded-t-xl shadow-sm mb-3"
+            style={{ width: "100%", height: "250px" }}
+          ></div>
+          <span className="text-xs pl-2">
+            Location <span className="text-red-500 text-sm">*</span>
+          </span>
+          <Controller
+            name="location"
+            control={control}
+            rules={{
+              required: "This field is required",
+            }}
+            render={({ field }) => (
+              <AsyncSelect
+                {...field}
+                isMulti
+                isClearable
+                isSearchable
+                loadOptions={loadOptions}
+                onChange={(location) => {
+                  handleSelectLocation({ map, location });
+                  field.onChange(location);
+                }}
+                getOptionLabel={(option) => option.label}
+                getOptionValue={(option) => option.value}
+                placeholder="Search for a location"
+                isLoading={isLocationsLoading}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    border: "none",
+                    borderRadius: "12px",
+                    boxShadow: "none",
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    zIndex: 1000,
+                  }),
+                }}
+              />
+            )}
+          />
+        </div>
+        {/* {errors?.company && (
+          <span className="text-red-500 text-xs pl-1">
+            {errors?.company.message}
+          </span>
+        )} */}
       </div>
     </div>
   );
 };
 
-const mapStateToProps = ({
-  mapModel: { isLocationsLoading, locations, selectedLocations },
-}) => ({
+const mapStateToProps = ({ mapModel: { isLocationsLoading } }) => ({
   isLocationsLoading,
-  locations,
-  selectedLocations,
 });
 
 export default connect(mapStateToProps)(MapWithSearch);

@@ -4,11 +4,15 @@ export const technicianTypedefs = `
     type Company {
       id: ID
       name: String
+      companyLicenseNo: String!
+      companyLicenseFile: [File]
     }
 
     input CompanyInput {
       id: ID
       name: String
+      companyLicenseNo: String!
+      companyLicenseFile: [FileInput]
     }
 
     type Location {
@@ -31,7 +35,7 @@ export const technicianTypedefs = `
 
     input TechnicianInput {
         id: ID
-        company: CompanyInput
+        company: ID
         firstName: String
         lastName: String!
         phoneWhatsapp: String
@@ -40,8 +44,6 @@ export const technicianTypedefs = `
         dateOfBirth: Date
         eId: String
         eIdFile: [FileInput]
-        companyLicenseNo: String
-        companyLicenseFile: [FileInput]
         profession: Profession
         supportFile: FileInput
         hasDrivingLicense: Boolean
@@ -53,7 +55,8 @@ export const technicianTypedefs = `
 
     type Technician {
         id: ID!
-        company: Company
+        company: ID
+        Company: Company
         firstName: String
         lastName: String
         phoneWhatsapp: String
@@ -62,8 +65,6 @@ export const technicianTypedefs = `
         dateOfBirth: Date
         eId: String
         eIdFile: [File]
-        companyLicenseNo: String
-        companyLicenseFile: [File]
         profession: Profession
         supportFile: File
         hasDrivingLicense: Boolean
@@ -75,7 +76,7 @@ export const technicianTypedefs = `
 
     input UpdateTechnicianInput {
         id: ID!
-        company: [CompanyInput]
+        company: ID
         firstName: String
         lastName: String
         phoneWhatsapp: String
@@ -84,8 +85,6 @@ export const technicianTypedefs = `
         dateOfBirth: Date
         eId: String
         eIdFile: FileInput
-        companyLicenseNo: String
-        companyLicenseFile: FileInput
         profession: Profession
         supportFile: FileInput
         hasDrivingLicense: Boolean
@@ -122,7 +121,7 @@ export const technicianTypedefs = `
 
       type UpdateTechnician {
         id: ID
-        company: [Company]
+        company: ID
         firstName: String
         lastName: String
         phoneWhatsapp: String
@@ -131,8 +130,6 @@ export const technicianTypedefs = `
         dateOfBirth: Date
         eId: String
         eIdFile: File
-        companyLicenseNo: String
-        companyLicenseFile: File
         profession: Profession
         supportFile: File
         hasDrivingLicense: Boolean

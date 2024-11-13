@@ -13,6 +13,7 @@ import { Server } from "socket.io";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.mjs";
 import { filterResolvers } from "./resolvers/filterResolvers.js";
 import { filterTypedefs } from "./typeDefs/filterTypedefs.js";
+import "./db/database.js";
 
 const app = express();
 

@@ -1,194 +1,213 @@
-import React from "react";
+/* eslint-disable react/prop-types */
+import React, { useEffect, useState } from "react";
 import Company from "../Company/Company";
 import MapWithSearch from "../MapWithSearch/MapWithSearch";
+import {
+  Input,
+  Radio,
+  RadioGroup,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
+import FileUpload from "../FileUpload/FileUpload";
+import { Controller } from "react-hook-form";
 
 export default function ProfessionalDetails({
+  control,
   register,
   errors,
   hasDrivingLicense,
+  watch,
+  setValue,
 }) {
+  const profession = [
+    { key: "cctvTechnician", label: "CCTV Technician" },
+    { key: "electrician", label: "Electrician" },
+    { key: "plumber", label: "Plumber" },
+  ];
+
+  const eIdFile = watch("eIdFile");
+  const supportFile = watch("supportFile");
+  const drivingLicenseFile = watch("drivingLicenseFile");
+
+  useEffect(() => {
+    if (eIdFile) {
+      setValue("eIdFile", eIdFile);
+    }
+    if (supportFile) {
+      setValue("supportFile", supportFile);
+    }
+    if (drivingLicenseFile) {
+      setValue("drivingLicenseFile", drivingLicenseFile);
+    }
+  }, [eIdFile, supportFile, drivingLicenseFile]);
+
   return (
     <div className="">
       <div className="flex justify-center w-full mt-6 bg-gradient-to-br from-green-500 via-green-400 to-green-300 rounded-md p-1 text-white font-semibold md:col-auto">
         Professional Details
       </div>
-      <div className="grid gap-6 mb-6 py-10 md:grid-cols-2">
-        <div className="md:col-span-2">
-          <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Company Name
-          </span>
-          <Company />
-        </div>
-        <div className="">
-          <span className="block  my-2 text-sm font-medium text-gray-900 dark:text-white">
-            Emirates ID
-          </span>
-          <input
-            type="number"
-            name="eId"
+
+      <div className="bg-white border-1 rounded-xl mt-5">
+        <span className="text-xs pl-2">
+          Company Name <span className="text-red-500 text-sm">*</span>
+        </span>
+        <Company control={control} setValue={setValue} errors={errors} />
+      </div>
+      {errors?.company && (
+        <span className="text-red-500 text-xs pl-1">
+          {errors?.company.message}
+        </span>
+      )}
+
+      <div className="grid gap-6 mb-6 py-5 md:grid-cols-2">
+        <div>
+          <Input
+            className="mb-4"
+            size="sm"
+            type="text"
             {...register("eId", {
               required: "This field is required",
             })}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="emirates id no."
+            label="Emirates ID No."
+            isInvalid={errors?.eId}
+            errorMessage={errors?.eId?.message}
+            isRequired
           />
-          {errors.eId && (
-            <span className="text-red-500">{errors.eId.message}</span>
-          )}
-          <input
-            type="file"
+
+          <Controller
             name="eIdFile"
-            {...register("eIdFile", {
-              required: "This field is required",
-            })}
-            className="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="emirates id File"
+            control={control}
+            rules={{ required: "This field is required" }}
+            render={({ field: { onChange, ...field } }) => (
+              <FileUpload
+                label="Emirates ID File"
+                isRequired
+                error={errors?.eIdFile}
+                onChange={(e) => {
+                  onChange(e.target.files[0]);
+                }}
+                {...field}
+              />
+            )}
           />
-          {errors.eIdFile && (
-            <span className="text-red-500">{errors.eIdFile.message}</span>
-          )}
         </div>
+
         <div>
-          <span className="block  my-2 text-sm font-medium text-gray-900 dark:text-white">
-            Company license no.
-          </span>
-          <input
-            type="text"
-            name="companyLicenseNo"
-            {...register("companyLicenseNo", {
-              required: "This field is required",
-            })}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="company license no."
-          />
-          {errors.companyLicenseNo && (
-            <span className="text-red-500">
-              {errors.companyLicenseNo.message}
-            </span>
-          )}
-          <input
-            type="file"
-            name="companyLicenseFile"
-            {...register("companyLicenseFile", {
-              required: "This field is required",
-            })}
-            className="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="company license doc."
-          />
-          {errors.companyLicenseFile && (
-            <span className="text-red-500">
-              {errors.companyLicenseFile.message}
-            </span>
-          )}
-        </div>
-        <div>
-          <span className="block  mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Profession
-          </span>
-          <select
-            type="select"
-            name="profession"
+          <Select
+            size="sm"
+            label="Profession"
+            placeholder="Select Profession"
+            className="max-w-xs mb-4"
             {...register("profession", {
               required: "This field is required",
             })}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Select Profession"
+            isInvalid={errors?.profession}
+            errorMessage={errors?.profession?.message}
+            isRequired
           >
-            <option value="" disabled>
-              Select profession
-            </option>
-            <option value="cctvTechnician">CCTV Technician</option>
-            <option value="electrician">Electrician</option>
-            <option value="plumber">Plumber</option>
-          </select>
-          {errors.profession && (
-            <span className="text-red-500">{errors.profession.message}</span>
-          )}
-          <div>
-            <span className="block pt-2 mb-2 text-sm font-medium text-gray-900 dark:text-white">
-              Support File
-            </span>
-            <input
-              type="file"
-              name="supportFile"
-              {...register("supportFile", {
-                required: "This field is required",
-              })}
-              className="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="support file"
-            />
-            {errors.supportFile && (
-              <span className="text-red-500">{errors.supportFile.message}</span>
+            {profession.map((prof) => (
+              <SelectItem key={prof.key}>{prof.label}</SelectItem>
+            ))}
+          </Select>
+
+          <Controller
+            name="supportFile"
+            control={control}
+            rules={{ required: "This field is required" }}
+            render={({ field: { onChange, ...field } }) => (
+              <FileUpload
+                label="Profession Support File"
+                isRequired
+                error={errors?.supportFile}
+                onChange={(e) => {
+                  onChange(e.target.files[0]);
+                }}
+                {...field}
+              />
             )}
-          </div>
+          />
         </div>
-        <div>
-          <span className="block mb-2 text-sm font-medium text-gray-900">
-            Driving license no.
-          </span>
-          <input
-            type="radio"
-            {...register("hasDrivingLicense", {
-              required: "This field is required",
-            })}
-            className="rounded-lg p-2 m-2"
-            value="true"
-            checked={hasDrivingLicense === "true"}
-          />
-          <span className=" mb-2 text-sm text-gray-900">Yes</span>
-          <input
-            type="radio"
-            {...register("hasDrivingLicense", {
-              required: "This field is required",
-            })}
-            className="rounded-lg p-2 m-2"
-            value="false"
-            checked={hasDrivingLicense === "false"}
-          />
-          <span className=" mb-2 text-sm text-gray-900">No</span>
-          {errors.hasDrivingLicense && (
-            <span className="text-red-500">
-              {errors.hasDrivingLicense.message}
-            </span>
+
+        <Controller
+          control={control}
+          name="hasDrivingLicense"
+          defaultValue="false"
+          rules={{ required: "This field is required" }}
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup
+              label="Do you have a driving license?"
+              orientation="horizontal"
+              value={value}
+              onValueChange={onChange}
+              isInvalid={errors?.hasDrivingLicense}
+              errorMessage={errors?.hasDrivingLicense?.message}
+              classNames={{ label: "text-black" }}
+            >
+              <Radio
+                size="sm"
+                value="true"
+                className="checked:border-green-500"
+                classNames={{
+                  wrapper: "bg-white border-green-500",
+                  control: "bg-green-500",
+                }}
+              >
+                Yes
+              </Radio>
+
+              <Radio
+                size="sm"
+                value="false"
+                classNames={{
+                  wrapper: "bg-white border-green-500",
+                  control: "bg-green-500",
+                }}
+              >
+                No
+              </Radio>
+            </RadioGroup>
           )}
+        />
+
+        <div>
           {hasDrivingLicense === "true" && (
             <div>
-              <input
+              <Input
+                className="mb-4"
+                size="sm"
                 type="number"
-                name="drivingLicenseNo"
                 {...register("drivingLicenseNo", {
                   required: "This field is required",
                 })}
-                className="my-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="driving license no."
+                label="Driving License No."
+                isInvalid={errors?.drivingLicenseNo}
+                errorMessage={errors?.drivingLicenseNo?.message}
+                isRequired
               />
-              {errors.drivingLicenseNo && (
-                <span className="text-red-500">
-                  {errors.drivingLicenseNo.message}
-                </span>
-              )}
-              <input
-                type="file"
+
+              <Controller
                 name="drivingLicenseFile"
-                {...register("drivingLicenseFile", {
-                  required: "This field is required",
-                })}
-                className="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="driving license file"
+                control={control}
+                rules={{ required: "This field is required" }}
+                render={({ field: { onChange, ...field } }) => (
+                  <FileUpload
+                    label="Driving License File"
+                    isRequired
+                    error={errors?.supportFile}
+                    onChange={(e) => {
+                      onChange(e.target.files[0]);
+                    }}
+                    {...field}
+                  />
+                )}
               />
-              {errors.drivingLicenseFile && (
-                <span className="text-red-500">
-                  {errors.drivingLicenseFile.message}
-                </span>
-              )}
             </div>
           )}
         </div>
+
         <div className="md:col-span-2">
-          <span className="block text-sm font-medium text-gray-900">
-            Location
-          </span>
-          <MapWithSearch />
+          <MapWithSearch control={control} />
         </div>
       </div>
     </div>

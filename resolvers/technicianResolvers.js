@@ -3,322 +3,168 @@ import { db } from "../db/connection.js";
 import { Technician } from "../db/models/technicianModel.js";
 import nodemailer from "nodemailer";
 import { Company } from "../db/models/companyModel.js";
+import { sequelize } from "../db/models/technicianModel.js";
 
 export const technicianResolvers = {
-  Date: {
-    Date: new GraphQLScalarType({
-      name: "Date",
-      description: "Date custom scalar type",
-      parseValue: (value) => new Date(value),
-      serialize: (value) => new Date(value),
-      parseLiteral: (value) => {
-        if (value.kind === "StringValue") {
-          return new Date(value.value);
-        }
-        return null;
-      },
-    }),
-  },
-  Query: {
-    getTechnician: async (_, { id }) => {
-      return Technician.findByPk(id);
+  Date: new GraphQLScalarType({
+    name: "Date",
+    description: "Date custom scalar type",
+    parseValue: (value) => new Date(value),
+    serialize: (value) => {
+      const date = typeof value === "string" ? new Date(value) : value;
+      return date instanceof Date && !isNaN(date) ? date.toISOString() : null;
     },
-
-    getTechnicians: async (_, args) => {
-      try {
-        const { page = 1, pageSize = 9 } = args;
-        const offset = (page - 1) * pageSize;
-        const technicians = await Technician.findAll({
-          offset,
-          limit: pageSize,
-        });
-
-        const totalTechnicians = await Technician.count();
-        return {
-          success: true,
-          message: "Technicians retrieved successfully",
-          technicians: technicians,
-          pageInfo: {
-            page,
-            pageSize,
-            total: totalTechnicians,
-          },
-        };
-      } catch (error) {
-        return {
-          success: false,
-          message: "Failed to retrieve technicians",
-          technicians: [],
-          pageInfo: {
-            page: 1,
-            pageSize: 7,
-            total: 0,
-          },
-        };
+    parseLiteral: (ast) => {
+      if (ast.kind === "StringValue") {
+        return new Date(ast.value);
       }
+      return null;
+    },
+  }),
+
+  Query: {
+    getTechnician: async (_, { id }) => Technician.findByPk(id),
+
+    getTechnicians: async (_, { page = 1, pageSize = 9 }) => {
+      const offset = (page - 1) * pageSize;
+
+      const technicians = await Technician.findAll({
+        offset,
+        limit: pageSize,
+        include: [
+          {
+            model: Company,
+            as: "Company",
+            attributes: ["name", "companyLicenseNo", "companyLicenseFile"],
+            required: true,
+          },
+        ],
+        order: [[{ model: Company, as: "Company" }, "id", "ASC"]],
+      });
+
+      const totalTechnicians = await Technician.count();
+      return {
+        success: true,
+        message: "Technicians retrieved successfully",
+        technicians,
+        pageInfo: {
+          page,
+          pageSize,
+          total: totalTechnicians,
+        },
+      };
     },
 
-    getCompanies: async () => {
-      return Company.findAll();
-    },
+    getCompanies: async () => Company.findAll(),
   },
 
   Mutation: {
     createCompany: async (_, { input }) => {
-      const newCompany = Company.create(input);
-      return newCompany;
-    },
-    createTechnician: async (_, input) => {
-      let connection;
+      const transaction = await sequelize.transaction();
       try {
-        connection = await db.getConnection();
-        if (!connection) {
-          throw new Error("Database connection is undefined.");
-        }
+        const { name, companyLicenseNo, companyLicenseFile } = input;
 
-        const { technicianInput } = input;
-        if (!technicianInput || typeof technicianInput !== "object") {
+        if (!companyLicenseNo || !companyLicenseFile) {
           throw new Error(
-            "Invalid input. Technician data is missing or not an object."
+            "Both company license number and license file must be provided."
           );
         }
 
-        const { company, ...technicianData } = technicianInput;
-        connection.beginTransaction();
-
-        let companyId;
-        let companyName;
-        if (company && company.name) {
-          const [existingCompany] = await connection.execute(
-            "SELECT * FROM Companies WHERE name = ?",
-            [company.name]
-          );
-
-          if (existingCompany.length > 0) {
-            companyId = existingCompany[0].id;
-            companyName = existingCompany[0].name;
-          } else {
-            const [companyResult] = await connection.execute(
-              "INSERT INTO Companies (name) VALUES (?)",
-              [company.name]
-            );
-            companyId = companyResult.insertId || companyResult.lastID;
-            companyName = company.name;
-          }
-        } else {
-          companyId = null;
+        const existingCompany = await Company.findOne({
+          where: { name },
+          transaction,
+        });
+        if (existingCompany) {
+          throw new Error("A company with this name already exists.");
         }
 
-        const [result] = await connection.execute(
-          "INSERT INTO Technicians (firstName, lastName, phoneWhatsapp, phone, email, dateOfBirth, eId, eIdFile, company, companyLicenseNo, companyLicenseFile, profession, supportFile, hasDrivingLicense, drivingLicenseNo, drivingLicenseFile, location, approvalStatus, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
-          [
-            technicianData.firstName,
-            technicianData.lastName,
-            technicianData.phoneWhatsapp,
-            technicianData.phone,
-            technicianData.email,
-            technicianData.dateOfBirth,
-            technicianData.eId,
-            technicianData.eIdFile,
-            JSON.stringify(company),
-            technicianData.companyLicenseNo,
-            technicianData.companyLicenseFile,
-            technicianData.profession || "cctvTechnician",
-            technicianData.supportFile,
-            technicianData.hasDrivingLicense,
-            technicianData.drivingLicenseNo,
-            technicianData.drivingLicenseFile,
-            technicianData.location,
-            technicianData.approvalStatus || "Waiting_for_approval",
-          ]
-        );
-        await connection.commit();
-        if (connection) {
-          connection.release();
-        }
+        const newCompany = await Company.create(input, { transaction });
+        await transaction.commit();
+
         return {
-          id: result.insertId,
+          id: newCompany.id,
+          name: newCompany.name,
+          companyLicenseNo: newCompany.companyLicenseNo,
+          companyLicenseFile: newCompany.companyLicenseFile,
+          success: true,
+          message: "Company created successfully",
+        };
+      } catch (error) {
+        await transaction.rollback();
+        throw error;
+      }
+    },
+
+    createTechnician: async (_, { technicianInput }) => {
+      const transaction = await sequelize.transaction();
+      try {
+        const { company, ...technicianData } = technicianInput;
+
+        const newTechnician = await Technician.create(
+          {
+            ...technicianData,
+            company,
+            approvalStatus:
+              technicianData.approvalStatus || "Waiting_for_approval",
+          },
+          { transaction }
+        );
+
+        await transaction.commit();
+        return {
+          id: newTechnician.id,
           success: true,
           message: "Technician created successfully",
-          company: {
-            id: company.id,
-            name: company.name,
-          },
         };
       } catch (error) {
-        if (connection) {
-          connection.rollback();
-          connection.release();
-          return {
-            success: false,
-            message: error,
-          };
-        }
-        console.error("Error connecting to the database:", error);
+        await transaction.rollback();
         throw error;
       }
     },
 
-    updateTechnician: async (_, input) => {
-      let connection;
+    updateTechnician: async (_, { id, technicianInput }) => {
+      const transaction = await sequelize.transaction();
       try {
-        connection = await db.getConnection();
-        if (!connection) {
-          throw new Error("Database connection is undefined.");
-        }
-        const { company, ...updatedTechnicianData } = input;
-        connection.beginTransaction();
+        const { companyId, ...updatedTechnicianData } = technicianInput;
 
-        let companyId;
-        if (
-          updatedTechnicianData.company &&
-          updatedTechnicianData.company.name
-        ) {
-          const [existingCompany] = await connection.execute(
-            "SELECT * FROM Companies WHERE name = ?",
-            [updatedTechnicianData.company.name]
-          );
-
-          if (existingCompany.length > 0) {
-            companyId = existingCompany[0].id;
-          } else {
-            const [companyResult] = await connection.execute(
-              "INSERT INTO Companies (name) VALUES (?)",
-              [updatedTechnicianData.company.name]
-            );
-            companyId = companyResult.insertId || companyResult.lastID;
-          }
-        } else {
-          companyId = null;
-        }
-
-        const [result] = await connection.execute(
-          "UPDATE Technicians SET firstName = ?, lastName = ?, phoneWhatsapp = ?, phone = ?, email = ?, dateOfBirth = ?, eId = ?, eIdFile = ?, company = ?, companyLicenseNo = ?, companyLicenseFile = ?, profession = ?, supportFile = ?, hasDrivingLicense = ?, drivingLicenseNo = ?,  drivingLicenseFile = ?, location = ?, approvalStatus = ?  WHERE id = ?",
-          [
-            updatedTechnicianData.firstName,
-            updatedTechnicianData.lastName,
-            updatedTechnicianData.phoneWhatsapp,
-            updatedTechnicianData.phone,
-            updatedTechnicianData.email,
-            updatedTechnicianData.dateOfBirth,
-            updatedTechnicianData.eId,
-            updatedTechnicianData.eIdFile,
-            JSON.stringify(company),
-            updatedTechnicianData.companyLicenseNo,
-            updatedTechnicianData.companyLicenseFile,
-            updatedTechnicianData.profession,
-            updatedTechnicianData.supportFile,
-            updatedTechnicianData.hasDrivingLicense,
-            updatedTechnicianData.drivingLicenseNo,
-            updatedTechnicianData.drivingLicenseFile,
-            updatedTechnicianData.location,
-            updatedTechnicianData.approvalStatus,
-          ]
+        await Technician.update(
+          { ...updatedTechnicianData, companyId },
+          { where: { id }, transaction }
         );
-        await connection.commit();
-        if (connection) {
-          connection.release();
-        }
+
+        await transaction.commit();
         return {
-          id: result.id,
-          updatedTechnicianData: updatedTechnicianData,
-          company: {
-            id: companyId,
-            name:
-              updatedTechnicianData.company &&
-              updatedTechnicianData.company.name,
-          },
+          success: true,
+          message: "Technician updated successfully",
         };
       } catch (error) {
-        if (connection) {
-          connection.rollback();
-          connection.release();
-        }
-        console.error("Error connecting to the database:", error);
+        await transaction.rollback();
         throw error;
       }
     },
 
-    deleteTechnician: async (_, { input: { id } }) => {
-      let connection;
-      try {
-        connection = await db.getConnection();
-        await connection.beginTransaction();
-        if (id !== undefined) {
-          await connection.execute("DELETE FROM Technicians WHERE id = ?", [
-            id,
-          ]);
-        } else {
-          throw new Error("ID is undefined");
-        }
-        await connection.commit();
-        return { id };
-      } catch (error) {
-        await connection.rollback();
-        throw error;
-      } finally {
-        connection.release();
-      }
+    deleteTechnician: async (_, { id }) => {
+      await Technician.destroy({ where: { id } });
+      return { success: true, message: "Technician deleted successfully" };
     },
 
     handleApproval: async (_, { technicianId, status }) => {
       const technician = await Technician.findByPk(technicianId);
-
       if (!technician) {
-        return {
-          success: false,
-          message: "Technician not found",
-          status: status,
-        };
+        return { success: false, message: "Technician not found" };
       }
 
-      if (
-        status !== "Approved" &&
-        status !== "Rejected" &&
-        status !== "Waiting_for_approval"
-      ) {
-        return {
-          success: false,
-          message: "Invalid approval status",
-          status: status,
-        };
-      }
       technician.approvalStatus = status;
       await technician.save();
 
-      return {
-        success: true,
-        message: `Approval status for technician ${technicianId} updated to ${status}`,
-        status: status,
-      };
+      return { success: true, message: `Approval status updated to ${status}` };
     },
 
     sendApprovalMail: async (_, { technicianId, status }, { io }) => {
       const technician = await Technician.findByPk(technicianId);
-
       if (!technician) {
-        return {
-          success: false,
-          message: "Technician not found",
-          status: status,
-        };
+        return { success: false, message: "Technician not found" };
       }
-
-      if (status !== "Approved" && status !== "Rejected") {
-        return {
-          success: false,
-          message: "Invalid approval status for sending approval mail",
-          status: status,
-        };
-      }
-
-      const toEmail = technician.email;
-      const subject =
-        status === "Approved" ? "Coordees Approval" : "Coordees Rejection";
-      const text =
-        status === "Approved"
-          ? "Congratulations! Your registration has been approved."
-          : "We regret to inform you that your registration has been rejected.";
 
       const transporter = nodemailer.createTransport({
         host: "mail.coordees.com",
@@ -332,22 +178,22 @@ export const technicianResolvers = {
 
       const mailOptions = {
         from: "project@coordees.com",
-        to: toEmail,
-        subject: subject,
-        text: text,
-      };
-
-      await transporter.sendMail(mailOptions);
-
-      io.emit("approvalEmailSent", { technicianId });
-      return {
-        success: status === "Approved" ? true : false,
-        message:
+        to: technician.email,
+        subject: `Coordees ${status === "Approved" ? "Approval" : "Rejection"}`,
+        text:
           status === "Approved"
-            ? "Approval email sent successfully"
-            : "Rejection mail sent successfully",
-        status: status,
+            ? "Congratulations! Your registration has been approved."
+            : "We regret to inform you that your registration has been rejected.",
       };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        io.emit("approvalEmailSent", { technicianId });
+        return { success: true, message: `${status} email sent successfully` };
+      } catch (error) {
+        console.error("Error sending email:", error);
+        return { success: false, message: "Failed to send email" };
+      }
     },
   },
 };

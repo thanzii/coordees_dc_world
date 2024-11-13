@@ -1,90 +1,114 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
-import React from "react";
-import { connect } from "react-redux";
+import React, { useState } from "react";
+import { gql, useQuery } from "@apollo/client";
 import Select from "react-select";
-
-const CREATE_COMPANY = gql`
-  mutation CreateCompany($input: CompanyInput!) {
-    createCompany(input: $input) {
-      id
-      name
-    }
-  }
-`;
+import AddCompanyModal from "./AddCompanyModal";
+import { connect } from "react-redux";
+import { useDisclosure } from "@nextui-org/react";
+import { Controller } from "react-hook-form";
 
 const GET_COMPANIES = gql`
   query GetCompanies {
     getCompanies {
       id
       name
+      companyLicenseNo
+      companyLicenseFile {
+        fileName
+        mimeType
+        content
+      }
     }
   }
 `;
 
-function Company({ company, setCompany }) {
-  const handleCreateCompany = async (newCompanyName) => {
-    try {
-      await createCompany({
-        variables: {
-          input: { name: newCompanyName },
-        },
-        refetchQueries: [{ query: GET_COMPANIES }],
-      }).then(async (response) => {
-        const {
-          data: {
-            createCompany: { id, name },
-          },
-        } = response;
-
-        setCompany({ value: id, label: name });
-      });
-    } catch (error) {
-      console.error("Error creating company:", error);
-    }
-  };
-
-  const handleBlur = (e) => {
-    const inputValue = e.target.value;
-
-    if (inputValue.trim() !== "") {
-      if (
-        data?.getCompanies &&
-        !data.getCompanies.some((option) => option.label === inputValue)
-      ) {
-        handleCreateCompany(inputValue);
-      }
-    }
-  };
-
-  const [createCompany] = useMutation(CREATE_COMPANY);
+function Company({ control, setValue, errors }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [inputValue, setInputValue] = useState("");
   const { loading, error, data } = useQuery(GET_COMPANIES);
+
+  const handleSelectChange = (selected) => {
+    if (selected && selected.value === "add_new_company") {
+      onOpen();
+    } else {
+      setValue("company", selected.value);
+    }
+  };
+
+  const handleCompanyCreated = (newCompany) => {
+    setValue("company", newCompany);
+  };
+
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
-  const options =
-    data?.getCompanies?.map((company) => ({
-      value: company.id,
-      label: company.name,
+  const existingOptions =
+    data?.getCompanies.map((item) => ({
+      value: item,
+      label: item.name,
     })) || [];
+
+  const options = [
+    ...existingOptions,
+    ...(inputValue &&
+    !existingOptions.some(
+      (option) => option.label.toLowerCase() === inputValue.toLowerCase()
+    )
+      ? [
+          {
+            value: "add_new_company",
+            label: `No option, add '${inputValue}'?`,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <div>
-      <Select
-        options={options}
-        onBlur={handleBlur}
-        value={company}
-        onChange={(value) => setCompany(value)}
-        placeholder="Search Company Name"
-        defaultValue={{}}
+      <Controller
+        name="company"
+        control={control}
+        rules={{ required: "This field is required" }}
+        render={({ field }) => (
+          <Select
+            {...field}
+            isClearable
+            options={options}
+            value={
+              field?.value
+                ? { label: field.value.name, value: field.value }
+                : null
+            }
+            onChange={(selected) => {
+              handleSelectChange(selected);
+              // field.onChange(selected);
+            }}
+            onInputChange={(value) => setInputValue(value)}
+            placeholder="Select a Company or Add a new company"
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                border: "none",
+                borderRadius: "12px",
+                boxShadow: "none",
+              }),
+              menu: (provided) => ({
+                ...provided,
+                zIndex: 1000,
+              }),
+            }}
+          />
+        )}
+      />
+
+      <AddCompanyModal
+        isOpen={isOpen}
+        onClose={onClose}
+        resetCompany={() => setValue("company", null)}
+        onCompanyCreated={handleCompanyCreated}
+        inputValue={inputValue}
       />
     </div>
   );
 }
 
-const mapStateToProps = ({ techniciansModel: { company } }) => ({ company });
-
-const mapDispatchToProps = ({ techniciansModel: { setCompany } }) => ({
-  setCompany,
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Company);
+export default Company;

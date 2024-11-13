@@ -2,52 +2,38 @@ import React from "react";
 import PersonalInformationIcon from "../../assets/PersonalInformationIcon.svg";
 import CollectionIcon from "../../assets/CollectionIcon.svg";
 import ConfirmationIcon from "../../assets/ConfirmationIcon.svg";
-import check from "../../assets/check.svg";
 
-export default function Stepper({ totalSteps, currentStep }) {
-  const activeColor = (index) =>
-    currentStep >= index ? "bg-green-400" : "bg-green-100";
-  const isFinalStep = (index) => index === totalSteps;
+export default function VerticalAccordion({ currentStep, setCurrentStep }) {
+  const accordionTitles = [
+    "User Details",
+    "Professional Details",
+    "Confirmation",
+  ];
+  const icons = [PersonalInformationIcon, CollectionIcon, ConfirmationIcon];
 
-  const getIcon = (index) => {
-    if (index === 0) {
-      return (
-        <div className="flex justify-center mt-2">
-          <img src={PersonalInformationIcon} />
-        </div>
-      );
-    } else if (index === 1) {
-      return (
-        <div className="flex justify-center mt-2">
-          <img src={CollectionIcon} />
-        </div>
-      );
-    } else if (index === 2) {
-      return (
-        <div className="flex justify-center mt-2">
-          <img src={ConfirmationIcon} />
-        </div>
-      );
-    }
-    return null;
+  const handleStepClick = (index) => {
+    setCurrentStep(index);
   };
 
   return (
-    <div className="flex justify-center items-center">
-      {Array.from({ length: totalSteps + 1 }).map((_, index) => (
-        <React.Fragment key={index}>
-          <div className={`w-12 h-12 rounded-full ${activeColor(index)}`}>
-            {currentStep > index ? (
-              <div className="flex justify-center m-4 w-5 h-5 text-white">
-                <img src={check} />
-              </div>
-            ) : null}
-            {currentStep === index ? getIcon(index) : null}
-          </div>
-          {isFinalStep(index) ? null : (
-            <div className={`w-44 h-1 ${activeColor(index)}`}></div>
-          )}
-        </React.Fragment>
+    <div className="flex flex-col items-center space-y-4 py-8 rounded-l-md ">
+      {accordionTitles.map((title, index) => (
+        <div
+          key={index}
+          className={`w-3/4 flex items-center px-4 py-3 cursor-pointer rounded-md ${
+            currentStep === index
+              ? "bg-green-100 text-green-600 font-semibold"
+              : "bg-stone-200 text-stone-600"
+          }`}
+          onClick={() => handleStepClick(index)}
+        >
+          <img
+            src={icons[index]}
+            alt={`${title} Icon`}
+            className="mr-3 h-6 w-6"
+          />
+          <span>{title}</span>
+        </div>
       ))}
     </div>
   );

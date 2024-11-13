@@ -11,7 +11,7 @@ import { NextUIProvider } from "@nextui-org/react";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ApolloProvider client={client}>
     <Provider store={store}>
-      <NextUIProvider>
+      <NextUIProvider locale="en-GB">
         <App />
       </NextUIProvider>
     </Provider>
